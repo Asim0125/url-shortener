@@ -117,21 +117,21 @@ The application follows a layered backend architecture consisting of:
 
 ```
 ┌─────────────┐      ┌──────────────────┐      ┌─────────────────┐
-│   Client     │ ───▶ │  Controller Layer │ ───▶ │  Service Layer   │
+│   Client      ───▶  Controller Layer   ───▶   Service Layer   
 └─────────────┘      └──────────────────┘      └─────────────────┘
                                                           │
                                           ┌───────────────┼───────────────┐
                                           ▼                               ▼
                                  ┌────────────────┐             ┌──────────────────┐
-                                 │   Redis Cache    │             │ Repository Layer  │
-                                 │  (short → long)   │             │   (Spring Data)   │
+                                    Redis Cache                   Repository Layer  
+                                   (short → long)                   (Spring Data)   
                                  └────────────────┘             └──────────────────┘
                                                                           │
                                                                           ▼
                                                                  ┌──────────────────┐
-                                                                 │   PostgreSQL      │
-                                                                 │  (URL mappings,   │
-                                                                 │   click events)    │
+                                                                    PostgreSQL      
+                                                                   (URL mappings,   
+                                                                    click events)    
                                                                  └──────────────────┘
 ```
 
@@ -163,24 +163,25 @@ The application follows a layered backend architecture consisting of:
 4. Original URL and short code are stored.
 5. Response containing the short URL is returned.
 
-```
-Client            Controller            Service              Repository        Database
-  │  POST /shorten     │                     │                     │               │
-  │────────────────────▶                     │                     │               │
-  │                     │  shortenUrl(url)    │                     │               │
-  │                     │────────────────────▶                     │               │
-  │                     │                     │  generateCode()     │               │
-  │                     │                     │  save(mapping)      │               │
-  │                     │                     │────────────────────▶               │
-  │                     │                     │                     │  INSERT       │
-  │                     │                     │                     │──────────────▶
-  │                     │                     │◀────────────────────               │
-  │                     │◀────────────────────                     │               │
-  │◀────────────────────                      │                     │               │
-  │  { shortUrl }       │                     │                     │               │
-```
+```mermaid
+flowchart LR
 
----
+    C[Client]
+    CT[Controller]
+    S[Service]
+    R[Repository]
+    DB[(PostgreSQL)]
+
+    C -->|POST /shorten| CT
+    CT -->|shortenUrl(url)| S
+    S -->|generateCode()| S
+    S -->|save(mapping)| R
+    R -->|INSERT mapping| DB
+    DB -->|Saved| R
+    R -->|Mapping saved| S
+    S -->|Short URL| CT
+    CT -->|{ shortUrl }| C
+```
 
 ## URL Redirection Flow
 
