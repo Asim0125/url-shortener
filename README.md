@@ -164,23 +164,22 @@ The application follows a layered backend architecture consisting of:
 5. Response containing the short URL is returned.
 
 ```mermaid
-flowchart LR
+sequenceDiagram
+    participant C as Client
+    participant CT as Controller
+    participant S as Service
+    participant R as Repository
+    participant DB as Database
 
-    C[Client]
-    CT[Controller]
-    S[Service]
-    R[Repository]
-    DB[(PostgreSQL)]
-
-    C -->|POST /shorten| CT
-    CT -->|shortenUrl(url)| S
-    S -->|generateCode()| S
-    S -->|save(mapping)| R
-    R -->|INSERT mapping| DB
-    DB -->|Saved| R
-    R -->|Mapping saved| S
-    S -->|Short URL| CT
-    CT -->|{ shortUrl }| C
+    C->>CT: POST shorten
+    CT->>S: Shorten URL
+    S->>S: Generate Code
+    S->>R: Save Mapping
+    R->>DB: INSERT Mapping
+    DB-->>R: Saved
+    R-->>S: Mapping Saved
+    S-->>CT: Short URL
+    CT-->>C: Short URL Response
 ```
 
 ## URL Redirection Flow
