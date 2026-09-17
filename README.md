@@ -191,22 +191,30 @@ sequenceDiagram
 5. The result can then be cached.
 6. User is redirected to the original URL.
 
-```
-Client            Controller            Service            Redis          Database
-  │  GET /{code}        │                    │                │               │
-  │─────────────────────▶                    │                │               │
-  │                      │  resolve(code)     │                │               │
-  │                      │───────────────────▶                │               │
-  │                      │                    │  GET code      │               │
-  │                      │                    │───────────────▶               │
-  │                      │                    │ ◀── HIT/MISS ──               │
-  │                      │                    │  (if MISS) query DB            │
-  │                      │                    │────────────────────────────────▶
-  │                      │                    │ ◀────── originalUrl ───────────
-  │                      │                    │  SET code → url (cache)        │
-  │                      │                    │───────────────▶               │
-  │                      │◀───────────────────                │               │
-  │◀── 302 Redirect ─────                     │                │               │
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant CT as Controller
+    participant S as Service
+    participant R as Redis
+    participant DB as Database
+
+    C->>CT: GET /{code}
+    CT->>S: resolve code
+    S->>R: GET code
+    R-->>S: HIT or MISS
+
+    alt Cache HIT
+        S-->>CT: original URL
+    else Cache MISS
+        S->>DB: Query URL mapping
+        DB-->>S: original URL
+        S->>R: SET code and URL
+        R-->>S: Cached
+        S-->>CT: original URL
+    end
+
+    CT-->>C: 302 Redirect
 ```
 
 ---
@@ -228,10 +236,9 @@ This keeps the hot path (redirects, which vastly outnumber URL creations in a re
 ---
 
 ## Analytics Processing
+The application tracks URL clicks so that URL usage can be monitored without making analytics processing part of the main redirect response.
 
-The application tracks URL clicks and processes analytics so that URL usage can be monitored without making every request depend directly on a database write.
-
-Click events (timestamp, short code, and optionally referrer/user-agent) are published to an internal event handler and persisted **asynchronously**, using Spring's `@Async` support (or a lightweight event bus). This decouples the redirect response — which must stay fast — from the analytics write path, so a slow or contended analytics table never adds latency to the user-facing redirect.
+Click events such as the timestamp and short code are processed asynchronously using Spring's `@Async` support. This keeps analytics processing separate from the main URL redirection flow.. This decouples the redirect response — which must stay fast — from the analytics write path, so a slow or contended analytics table never adds latency to the user-facing redirect.
 
 Aggregated click counts can then be exposed through a read endpoint (e.g. total clicks per short code, clicks over time) for basic usage insights.
 
@@ -245,7 +252,7 @@ Base62 encoding is used to generate compact URL identifiers using:
 - a–z
 - 0–9
 
-This allows numeric identifiers to be represented using shorter strings. A monotonically increasing internal ID (or a hash-derived numeric value) is converted into a Base62 string, so instead of storing a URL against an ID like `482910573`, the system stores and serves a short code like `Ab1x9Z`.
+This allows numeric identifiers to be represented using shorter strings.A unique numeric identifier is converted into a Base62 string, allowing the application to represent the identifier using a shorter, URL-friendly code.
 
 Because the alphabet has 62 characters, a 6-character Base62 code can represent over **56 billion** unique combinations (62⁶ ≈ 5.68 × 10¹⁰) — comfortably enough for a growing service while keeping short URLs genuinely short.
 
@@ -481,7 +488,7 @@ Environment variables can be used in place of hard-coded values for `DB_URL`, `D
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/<your-username>/url-shortener.git
+git clone https://github.com/Asim0125/url-shortener.git
 cd url-shortener
 ```
 
