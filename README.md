@@ -28,31 +28,29 @@
 
 ---
 
-## 📌 Table of Contents
+## 📚 Table of Contents
 
-- [Overview](#-overview)
-- [Problem Statement](#-problem-statement)
-- [Solution](#-solution)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Application Workflow](#-application-workflow)
-- [URL Shortening Flow](#-url-shortening-flow)
-- [URL Redirection Flow](#-url-redirection-flow)
-- [Redis Caching Strategy](#-redis-caching-strategy)
-- [Analytics Processing](#-analytics-processing)
-- [Base62 Encoding](#-base62-encoding)
-- [Data Persistence](#-data-persistence)
-- [Technology Stack](#-technology-stack)
-- [API Documentation](#-api-documentation)
-- [API Examples](#-api-examples)
-- [Project Structure](#-project-structure)
-- [Configuration](#-configuration)
-- [Running the Project](#-running-the-project)
-- [Testing](#-testing)
-- [Design Considerations](#-design-considerations)
-- [Future Improvements](#-future-improvements)
-
----
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Solution](#solution)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [Application Workflow](#application-workflow)
+- [URL Shortening Flow](#url-shortening-flow)
+- [URL Redirection Flow](#url-redirection-flow)
+- [Redis Caching Strategy](#redis-caching-strategy)
+- [Analytics Processing](#analytics-processing)
+- [Base62 Encoding](#base62-encoding)
+- [Data Persistence](#data-persistence)
+- [Technology Stack](#technology-stack)
+- [API Documentation](#api-documentation)
+- [API Examples](#api-examples)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Running the Project](#running-the-project)
+- [Testing](#testing)
+- [Design Considerations](#design-considerations)
+- [Future Improvements](#future-improvements)
 
 # 📖 Overview
 
